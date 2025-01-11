@@ -1,0 +1,105 @@
+---
+title: Multi-character Tokens
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+We can extend the concept of reading two-character symbols to those which contain more than two characters. Tokens like keywords and identifiers can contain varying number of characters and need to be handled in a special way. Let’s use the `default` block of the switch statement to implement this logic.
+
+**Identifiers and keywords**
+
+```tsx
+switch (this.currentChar) {
+  default: {
+    // Identifier/Keyword/Primitive type
+    if (/[A-Za-z_]/.test(this.currentChar)) {
+      let value = this.currentChar;
+      this.pos++;
+      while (
+        this.src[this.pos] !== undefined &&
+        /[A-Za-z0-9_]/.test(this.src[this.pos])
+      ) {
+        value += this.src[this.pos];
+        this.pos++;
+      }
+
+      if (GOM_KEYWORDS.has(value)) {
+        return {
+          type: getKeywordType(value),
+          value,
+          start: this.pos - value.length,
+          end: this.pos - 1,
+        };
+      }
+
+      if (GOM_PRIMITIVE_TYPES.has(value)) {
+        return {
+          type: getPrimitiveType(value),
+          value,
+          start: this.pos - value.length,
+          end: this.pos - 1,
+        };
+      }
+
+      return {
+        type: GomToken.IDENTIFIER,
+        value,
+        start: this.pos - value.length,
+        end: this.pos - 1,
+      };
+    }
+
+    throw new SyntaxError({
+      start: this.pos,
+      message: `Unidentified character '${this.currentChar}'`,
+    });
+  }
+}
+```
+
+To match an identifier or a keyword, we first test if the starting character matches the regular expression `/[A-Za-z_]/` , i.e. letters or underscore. Then, we run a second while loop to keep matching characters until the next character is not one of `/[A-Za-z0-9_]/`. This way we can match multi-character tokens that contain alphanumeric characters (plus underscore).
+
+Once we have the token, we check if it matches any Gom keyword or primitive type name and return the corresponding token. If it doesn’t, we return an `GomType.IDENTIFIER` token. Identifiers denote any user-defined values like variable and function names, function arguments, custom types and package names.
+
+**Literals**
+
+The [Gom syntax](https://www.notion.so/Design-types-semantics-the-Gom-EBNF-grammar-2aac5f5938544cac80dfd3d59f726472?pvs=21) states that the language has two types of literals — string and numeric. These can be handled similar to keywords and identifiers. The characteristic of a string literal is that it is always enclosed in `" "` , and that of numeric literal is that all of its characters are digits. This information helps in writing the logic to scan them.
+
+```tsx
+switch(this.currentChar) {
+  ...
+  default: {
+	  ...
+
+	  // String literal
+	  if (this.currentChar === '"') {
+      let value = this.currentChar;
+      let start = this.pos;
+      this.pos++;
+      while (this.src[this.pos] !== '"') {
+        value += this.src[this.pos];
+        this.pos++;
+      }
+
+      value += this.src[this.pos];
+
+      this.pos++;
+
+      return {
+        type: GomToken.STRLITERAL,
+        value,
+        start,
+        end: this.pos - 1,
+      };
+    }
+  }
+}
+```
+
+Similarly, number literals can be matched using `/[0-9]/` expression.
+
+<LinkCard
+  title="gom/src/lexer/index.ts"
+  href="https://github.com/gom-lang/gom/blob/main/src/lexer/index.ts"
+  description="Entire lexer code for Gom"
+/>

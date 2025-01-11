@@ -1,0 +1,44 @@
+---
+title: Writing a Compiler in TypeScript
+description: Learn how to write a compiler in TypeScript from scratch
+---
+
+import { Code } from "@astrojs/starlight/components";
+
+Compilers! Aren't they fascinating? If you've ever thought about how they worked and about building one, welcome! These set of pages are for you. We'll be building a compiler from scratch for a toy language called **Gom** - a language with a simple, familiar syntax.
+
+<Code
+code={`
+import io;
+
+fn main() {
+\tio.log("Hello, World!");
+}`}
+lang="rust"
+title="hello_world.gom"
+/>
+
+## What will we be building?
+
+We'll first introduce Gom, a simple language that we'll build a compiler for. Compilers are programs that understand some text and convert it into another form, usually a lower-level language. In our case, we'll be converting Gom code into [LLVM intermediate representation](https://llvm.org/docs/LangRef.html) (IR), which is a platform-independent representation of code that can then be compiled to machine code. Simply put, our compiler will convert Gom code into executable machine code.
+
+In our journey, we'll go through various phases of a compiler:
+
+- **Lexical Analysis**: Make sense of the text and convert it into Gom-tokens
+- **Parsing**: Read the tokens in their order and make sense of the structure of the code
+- **Semantic Analysis**: Understand the meaning of the code and check for errors, e.g. type mismatches
+- **Code Generation**: Convert the AST into LLVM IR
+
+## Why TypeScript?
+
+You might ask this, given that TypeScript is a rare choice in any production compilers. Well, while learning a new concept (which may have it's own complexities), it's best to use a language that you are comfortable with and avoid adding learning one more thing. TypeScript is my go-to language at work and side projects, and hence this course and the compiler is in TypeScript.
+
+<iframe
+  style="height:500px;border:2px solid #333;border-radius:4px"
+  src="https://www.linkedin.com/embed/feed/update/urn:li:share:7248691723432771585"
+  height="800"
+  width="504"
+  frameborder="0"
+  allowfullscreen=""
+  title="Embedded post"
+></iframe>

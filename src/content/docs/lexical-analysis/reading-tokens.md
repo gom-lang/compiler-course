@@ -1,0 +1,238 @@
+---
+title: Reading Tokens
+---
+
+The first stage of a compiler is lexical analysis, where the program text is read and converted into a set of *lexemes* or *tokens* according to the language grammar. These tokens are important in order to do further processing, they convert plain text to a sequence of meaningful pieces which then can be read by the parser to derive logical meaning. This stage at times can be skipped if you decide to use tools like *parser generators*. These tools automatically generate code for parsers (with a lexical analyser) from the language grammar. In our journey of building the Gom compiler, we’ll create a lexical analyser (also called lexer/scanner in short) ourselves, but if you are already aware of this process, you can take the parser generator path of this journey. We’ll meet again during intermediate representation generation.
+
+## Defining Token Types
+
+To begin, we’ll create a directory named `lexer` in `src` . The index file will contain the lexer class and `src/lexer/tokens.ts`  will contain a TypeScript enum of all Gom tokens. Let’s start by defining tokens from the EBNF grammar we created in the last chapter. Think of tokens as meaningful words in a paragraph. We ideally want to create tokens out of syntactically distinct group of characters. E.g. consider the following line.
+
+```tsx
+import io;
+```
+
+While reading this line (as a human), we interpret `import` and `io` as two distinct words, and expect the language to assign suitable meaning to each of them. Similarly, in the following line, even when whitespace does not separate characters, they ideally are distinct.
+
+```tsx
+io.log("Hello, world!");
+```
+
+The tokens would be `io`, `.`, `(`, `“` , `Hello, world!`, `"`, `)`, `"` and `;`.
+
+Now that we know what tokens are, we’ll begin by declaring an `enum` type that holds all the fundamental tokens types in Gom, beginning with keywords.
+
+```tsx
+// src/lexer/tokens.ts
+
+export enum GomToken {
+	// Keywords
+  IMPORT = "import",
+  TYPE = "type",
+  FN = "fn",
+  LET = "let",
+  FOR = "for",
+  RETURN = "return",
+  IF = "if",
+  ELSE = "else",
+  MAIN = "main",
+  
+  // Primitive types
+  I8 = "i8",
+  I16 = "i16",
+  F16 = "f16",
+  STR = "str",
+}
+```
+
+Keywords are words in a language that have a specific meaning when they appear independently. Next, let’s add symbols to the enum.
+
+```tsx
+// src/lexer/tokens.ts
+...
+	// Symbols
+  LPAREN = "(",
+  RPAREN = ")",
+  LBRACE = "{",
+  RBRACE = "}",
+  COLON = ":",
+  SEMICOLON = ";",
+  COMMA = ",",
+  DOT = ".",
+  EQ = "=",
+  PLUS = "+",
+  MINUS = "-",
+  MUL = "*",
+  DIV = "/",
+  EXP = "^",
+  GT = ">",
+  LT = "<",
+  GTE = ">=",
+  LTE = "<=",
+  EQEQ = "==",
+```
+
+Symbols are non-alphanumeric characters that are often used as operators or have special role, e.g. semicolon as a terminating character of a line in Gom.
+
+Lastly, we add identifiers. These are rest of the “content” of the program grouped in non-keyword terms and number and string literals. We also add a `INVALID` type to help mark invalid characters not understood by Gom. In all, this is how the enum looks.
+
+```tsx
+// src/lexer/tokens.ts
+
+export enum GomToken {
+  // Keywords
+  IMPORT = "import",
+  TYPE = "type",
+  FN = "fn",
+  LET = "let",
+  FOR = "for",
+  RETURN = "return",
+  IF = "if",
+  ELSE = "else",
+  MAIN = "main",
+
+  // Primitive types
+  I8 = "i8",
+  I16 = "i16",
+  F16 = "f16",
+  STR = "str",
+
+  // Symbols
+  LPAREN = "(",
+  RPAREN = ")",
+  LBRACE = "{",
+  RBRACE = "}",
+  COLON = ":",
+  SEMICOLON = ";",
+  COMMA = ",",
+  DOT = ".",
+  EQ = "=",
+  PLUS = "+",
+  MINUS = "-",
+  MUL = "*",
+  DIV = "/",
+  EXP = "^",
+  GT = ">",
+  LT = "<",
+  GTE = ">=",
+  LTE = "<=",
+  EQEQ = "==",
+
+  // Identifiers
+  IDENTIFIER = "identifier",
+  NUMLITERAL = "numliteral",
+  STRLITERAL = "strliteral",
+
+  // End of file
+  EOF = "eof",
+}
+```
+
+## Implementing the Lexical Analyser (lexer)
+
+The role of a lexical analyser is to read the input program text and convert it into meaningful tokens. We’ll be writing a TypeScript class to implement the Gom lexer. Let’s create it in the `src/lexer/index.ts` file. The lexer will be provided the text of the entry file of the Gom program as the input (string), and we’ll read the characters of the input one at a time, making decisions about creating the right tokens.
+
+The most important method exposed by the lexer is `nextToken()`  which retrieves the next token from the source program, usually called by the parser. The lexer is a stateful entity and mutates its state on each `nextToken()` call. We will maintain some position state in the lexer to store the current position so that we return the correct next token when the method is called.
+
+```tsx
+interface Token {
+	type: GomToken;        // -> Type of the token
+  value: string;         // -> string value of the token
+  start: number;         // -> Start position
+  end: number;           // -> End position
+}
+
+export class Lexer {
+	src: string;           // -> Source program text
+	pos: number;           // -> Current position of the lexer in the program text
+	currentChar: string;   // -> Current character in the program text
+	
+	constructor(src: string) {
+    this.src = src;
+    this.pos = 0;
+    this.currentChar = this.src[this.pos];
+  }
+	
+	nextToken(): Token;    // -> Get the next token in the program
+}
+```
+
+We also introduce a wrapper interface called `Token`, which will hold some metadata for the token e.g. it’s text value and position in the program text.
+
+The `nextToken()` method can be implemented in various ways but it is important to understand what we are trying to do here.
+
+> The lexer should convert the program text into a sequence of valid Gom tokens.
+> 
+
+When trying to convert text into tokens, the lexer must adhere to the Gom syntax and map the text to valid Gom tokens as listed in the GomToken enum above. Let’s start with some simple, single-character tokens. The `nextToken()` method in TypeScript will be a big switch statement.
+
+```tsx
+nextToken(): Token {
+	while(1) {
+		this.currentChar = this.src[this.pos];
+		
+		switch(this.currentChar) {
+			case "(":
+				this.pos++;
+				return {
+          type: GomToken.LPAREN,
+          value: this.currentChar,
+          start: this.pos - 1,
+          end: this.pos - 1,
+        };
+      case ")":
+				this.pos++;
+				return {
+          type: GomToken.RPAREN,
+          value: this.currentChar,
+          start: this.pos - 1,
+          end: this.pos - 1,
+        };
+        
+      default: {
+	      throw new SyntaxError({
+          start: this.pos,
+          message: `Unidentified character '${this.currentChar}'`,
+        });
+      }
+		}
+	}
+}
+```
+
+The above code builds a simple lexer that understands the `(` and `)` characters and converts them into tokens of type `GomToken.LPAREN` and `GomToken.RPAREN` respectively. Our `nextToken()` method uses an infinite loop to process characters of the program text, allowing us to make decisions about tokens without having to worry about their exact length. Whenever it finds a complete valid token, it returns from the function hence breaking the loop. If no character is matched, we throw a Gom `SyntaxError`, which is a wrapper over the `Error` object in TypeScript. It also prints out the position in the program text where the error-causing characters are present.
+
+### Ambiguity and two-character symbols
+
+To scan symbols containing two characters (e.g. `==`, `>=` etc.), we need to be careful while deciding the next token type. For example in case of `==`, the lexer will first see a `=` as it scans the program text one character at a time. If not handled properly, it might return the detected token as a `GomType.EQ` immediately, and a `==` symbol would then be scanned as `[GomType.EQ, GomType.EQ]` , which is incorrect as per the syntax.
+
+To handle such cases, all characters that might result into more than one symbols matching should be handled together. Here is how the above case for `==` can be handled.
+
+```tsx
+switch(this.currentChar) {
+	...
+	case "=":
+		if(this.src[this.pos + 1] === "=") {
+			// Symbol ==
+			this.pos += 2;
+      return {
+        type: GomToken.EQEQ,
+        value: "==",
+        start: this.pos - 2,
+        end: this.pos - 1,
+      };
+		}
+		
+		// Symbol =
+		this.pos++;
+    return {
+      type: GomToken.EQ,
+      value: this.currentChar,
+      start: this.pos - 1,
+      end: this.pos - 1,
+    };
+  ...
+}
+```
+
+Rest of the tokens containing one and two characters can be handled in a similar way.
