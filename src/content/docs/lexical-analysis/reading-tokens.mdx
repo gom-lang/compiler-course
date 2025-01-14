@@ -39,9 +39,7 @@ The tokens would be `io`, `.`, `(`, `“` , `Hello, world!`, `"`, `)`, `"` and `
 
 Now that we know what tokens are, we’ll begin by declaring an `enum` type that holds all the fundamental tokens types in Gom, beginning with keywords.
 
-```tsx
-// src/lexer/tokens.ts
-
+```ts title=src/lexer/tokens.ts
 export enum GomToken {
   // Keywords
   IMPORT = "import",
@@ -64,7 +62,7 @@ export enum GomToken {
 
 Keywords are words in a language that have a specific meaning when they appear independently. Next, let’s add symbols to the enum.
 
-```tsx
+```ts
 // src/lexer/tokens.ts
 ...
 	// Symbols
@@ -151,7 +149,7 @@ The role of a lexical analyser is to read the input program text and convert it 
 
 The most important method exposed by the lexer is `nextToken()` which retrieves the next token from the source program, usually called by the parser. The lexer is a stateful entity and mutates its state on each `nextToken()` call. We will maintain some position state in the lexer to store the current position so that we return the correct next token when the method is called.
 
-```tsx
+```ts title=src/lexer/index.ts
 interface Token {
   type: GomToken; // -> Type of the token
   value: string; // -> string value of the token
@@ -182,7 +180,7 @@ The `nextToken()` method can be implemented in various ways but it is important 
 
 When trying to convert text into tokens, the lexer must adhere to the Gom syntax and map the text to valid Gom tokens as listed in the GomToken enum above. Let’s start with some simple, single-character tokens. The `nextToken()` method in TypeScript will be a big switch statement.
 
-```tsx
+```ts title=src/lexer/index.ts
 nextToken(): Token {
 	while(1) {
 		this.currentChar = this.src[this.pos];
@@ -224,7 +222,7 @@ To scan symbols containing two characters (e.g. `==`, `>=` etc.), we need to be 
 
 To handle such cases, all characters that might result into more than one symbols matching should be handled together. Here is how the above case for `==` can be handled.
 
-```tsx
+```ts title=src/lexer/index.ts
 switch(this.currentChar) {
 	...
 	case "=":

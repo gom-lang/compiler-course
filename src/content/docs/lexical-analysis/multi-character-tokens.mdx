@@ -8,7 +8,7 @@ We can extend the concept of reading two-character symbols to those which contai
 
 ## Identifiers and keywords
 
-```tsx
+```ts title=src/lexer/index.ts
 switch (this.currentChar) {
   default: {
     // Identifier/Keyword/Primitive type
@@ -65,7 +65,7 @@ Once we have the token, we check if it matches any Gom keyword or primitive type
 
 The [Gom syntax](https://www.notion.so/Design-types-semantics-the-Gom-EBNF-grammar-2aac5f5938544cac80dfd3d59f726472?pvs=21) states that the language has two types of literals — string and numeric. These can be handled similar to keywords and identifiers. The characteristic of a string literal is that it is always enclosed in `" "` , and that of numeric literal is that all of its characters are digits. This information helps in writing the logic to scan them.
 
-```tsx
+```ts title=src/lexer/index.ts
 switch(this.currentChar) {
   ...
   default: {
