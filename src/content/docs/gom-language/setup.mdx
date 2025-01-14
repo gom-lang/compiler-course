@@ -1,0 +1,96 @@
+---
+title: Project Setup
+---
+
+import { Tabs, TabItem, FileTree, Code } from "@astrojs/starlight/components";
+
+To start writing the compiler, let's set up the project directory. The reference Gom compiler uses `npm` as the package manager, but you are free to use others to manage your dependencies. Let's start by creating a new Node project using `npm` and setting up the base project structure.
+
+<Tabs syncKey="package-manager">
+  <TabItem label="npm">
+    <Code code={"npm init -y"} lang="bash" />
+  </TabItem>
+  <TabItem label="yarn">
+    <Code code={"yarn init -y"} lang="bash" />
+  </TabItem>
+  <TabItem label="pnpm">
+    <Code code={"pnpm init -y"} lang="bash" />
+  </TabItem>
+</Tabs>
+
+To work with TypeScript, we'll install the `typescript` dependency and the [`tsx`](https://tsx.is/) package that allows directly executing TypeScript files.
+
+<Tabs syncKey="package-manager">
+  <TabItem label="npm">
+    <Code code={"npm install typescript tsx"} lang="bash" />
+  </TabItem>
+  <TabItem label="yarn">
+    <Code code={"yarn add typescript tsx"} lang="bash" />
+  </TabItem>
+  <TabItem label="pnpm">
+    <Code code={"pnpm add typescript tsx"} lang="bash" />
+  </TabItem>
+</Tabs>
+
+## Directory structure
+
+We'll place all our source code in the `src` directory and create one `run.ts` as an entry point for the compiler. Create the `run.ts` and `src/index.ts` files and leave them empty for now.
+
+<FileTree>
+
+- node_modules/
+- src
+  - index.ts
+- package-lock.json
+- package.json
+- run.ts
+
+</FileTree>
+
+### `src/index.ts`
+
+This is the main entry point that runs various phases of the compiler and passes output from each phase to the next one. The `main` function is essentially the _compiler pipeline_.
+
+```ts title=src/index.ts
+export default async function main(filePath: string) {
+  console.log(`Compiling ${filePath}`);
+}
+```
+
+### `run.ts`
+
+This file reads CLI arguments and passes them to `src/index.ts` to begin the compilation process. The main argument is the source code file path. Add the following code to `run.ts`.
+
+```ts title=run.ts {1}
+#!/usr/bin/env node
+
+import main from "./src/index";
+const filePath = process.argv[2];
+(async () => await main(filePath))();
+```
+
+The first line makes the file executable, allowing us to run it as follows:
+
+```bash
+npx tsx run.ts path/to/source.gom
+```
+
+### Using `npm run compile`
+
+Let's add a new script to our `package.json` to compile any Gom source code file.
+
+```json title=package.json ins={3}
+{
+  "scripts": {
+    "compile": "tsx run.ts"
+  }
+}
+```
+
+Now running the following command should print the file path of the source code file, we are ready to implement our compiler!
+
+```bash
+npm run compile path/to/source.gom
+
+# Output: Compiling path/to/source.gom
+```

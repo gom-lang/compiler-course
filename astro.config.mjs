@@ -58,10 +58,10 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'The Gom Programming Language',
+					label: 'The Gom Programming Language & Setup',
 					items: [
 						{ label: 'Introduction to Gom', slug: 'gom-language/introduction' },
-						{ label: '⏳ Syntax and Feel', slug: 'gom-language/syntax' },
+						{ label: 'Project Setup', slug: 'gom-language/setup' },
 					]
 				},
 				{

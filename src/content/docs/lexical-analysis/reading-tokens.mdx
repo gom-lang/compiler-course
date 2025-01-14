@@ -2,17 +2,28 @@
 title: Reading Tokens
 ---
 
-<style>
-    img:first-of-type { background-color: white; }
-</style>
+import { Image } from "astro:assets";
+import { FileTree } from "@astrojs/starlight/components";
+import tokensImage from "./images/tokens.png";
 
-![Tokens](./images/tokens.png)
+<Image src={tokensImage} alt="Tokens" style="background:white" />
 
-The first stage of a compiler is lexical analysis, where the program text is read and converted into a set of *lexemes* or *tokens* according to the language grammar. These tokens are important in order to do further processing, they convert plain text to a sequence of meaningful pieces which then can be read by the parser to derive logical meaning. This stage at times can be skipped if you decide to use tools like *parser generators*. These tools automatically generate code for parsers (with a lexical analyser) from the language grammar. In our journey of building the Gom compiler, we’ll create a lexical analyser (also called lexer/scanner in short) ourselves, but if you are already aware of this process, you can take the parser generator path of this journey. We’ll meet again during intermediate representation generation.
+The first stage of a compiler is lexical analysis, where the program text is read and converted into a set of _lexemes_ or _tokens_ according to the language grammar. These tokens are important in order to do further processing, they convert plain text to a sequence of meaningful pieces which then can be read by the parser to derive logical meaning. This stage at times can be skipped if you decide to use tools like _parser generators_. These tools automatically generate code for parsers (with a lexical analyser) from the language grammar. In our journey of building the Gom compiler, we’ll create a lexical analyser (also called lexer/scanner in short) ourselves, but if you are already aware of this process, you can take the parser generator path of this journey. We’ll meet again during intermediate representation generation.
 
 ## Defining Token Types
 
-To begin, we’ll create a directory named `lexer` in `src` . The index file will contain the lexer class and `src/lexer/tokens.ts`  will contain a TypeScript enum of all Gom tokens. Let’s start by defining tokens from the EBNF grammar we created in the last chapter. Think of tokens as meaningful words in a paragraph. We ideally want to create tokens out of syntactically distinct group of characters. E.g. consider the following line.
+To begin, we’ll create a directory named `lexer` in `src` . The index file will contain the lexer class and `src/lexer/tokens.ts` will contain a TypeScript enum of all Gom tokens.
+
+<FileTree>
+
+- src/
+  - lexer/
+    - index.ts
+    - tokens.ts
+
+</FileTree>
+
+Let’s start by defining tokens from the EBNF grammar we created in the last chapter. Think of tokens as meaningful words in a paragraph. We ideally want to create tokens out of syntactically distinct group of characters. E.g. consider the following line.
 
 ```gom
 import "io";
@@ -32,7 +43,7 @@ Now that we know what tokens are, we’ll begin by declaring an `enum` type that
 // src/lexer/tokens.ts
 
 export enum GomToken {
-	// Keywords
+  // Keywords
   IMPORT = "import",
   TYPE = "type",
   FN = "fn",
@@ -42,7 +53,7 @@ export enum GomToken {
   IF = "if",
   ELSE = "else",
   MAIN = "main",
-  
+
   // Primitive types
   I8 = "i8",
   I16 = "i16",
@@ -138,28 +149,28 @@ export enum GomToken {
 
 The role of a lexical analyser is to read the input program text and convert it into meaningful tokens. We’ll be writing a TypeScript class to implement the Gom lexer. Let’s create it in the `src/lexer/index.ts` file. The lexer will be provided the text of the entry file of the Gom program as the input (string), and we’ll read the characters of the input one at a time, making decisions about creating the right tokens.
 
-The most important method exposed by the lexer is `nextToken()`  which retrieves the next token from the source program, usually called by the parser. The lexer is a stateful entity and mutates its state on each `nextToken()` call. We will maintain some position state in the lexer to store the current position so that we return the correct next token when the method is called.
+The most important method exposed by the lexer is `nextToken()` which retrieves the next token from the source program, usually called by the parser. The lexer is a stateful entity and mutates its state on each `nextToken()` call. We will maintain some position state in the lexer to store the current position so that we return the correct next token when the method is called.
 
 ```tsx
 interface Token {
-	type: GomToken;        // -> Type of the token
-  value: string;         // -> string value of the token
-  start: number;         // -> Start position
-  end: number;           // -> End position
+  type: GomToken; // -> Type of the token
+  value: string; // -> string value of the token
+  start: number; // -> Start position
+  end: number; // -> End position
 }
 
 export class Lexer {
-	src: string;           // -> Source program text
-	pos: number;           // -> Current position of the lexer in the program text
-	currentChar: string;   // -> Current character in the program text
-	
-	constructor(src: string) {
+  src: string; // -> Source program text
+  pos: number; // -> Current position of the lexer in the program text
+  currentChar: string; // -> Current character in the program text
+
+  constructor(src: string) {
     this.src = src;
     this.pos = 0;
     this.currentChar = this.src[this.pos];
   }
-	
-	nextToken(): Token;    // -> Get the next token in the program
+
+  nextToken(): Token; // -> Get the next token in the program
 }
 ```
 
@@ -168,7 +179,6 @@ We also introduce a wrapper interface called `Token`, which will hold some metad
 The `nextToken()` method can be implemented in various ways but it is important to understand what we are trying to do here.
 
 > The lexer should convert the program text into a sequence of valid Gom tokens.
-> 
 
 When trying to convert text into tokens, the lexer must adhere to the Gom syntax and map the text to valid Gom tokens as listed in the GomToken enum above. Let’s start with some simple, single-character tokens. The `nextToken()` method in TypeScript will be a big switch statement.
 
@@ -176,7 +186,7 @@ When trying to convert text into tokens, the lexer must adhere to the Gom syntax
 nextToken(): Token {
 	while(1) {
 		this.currentChar = this.src[this.pos];
-		
+
 		switch(this.currentChar) {
 			case "(":
 				this.pos++;
@@ -194,7 +204,7 @@ nextToken(): Token {
           start: this.pos - 1,
           end: this.pos - 1,
         };
-        
+
       default: {
 	      throw new SyntaxError({
           start: this.pos,
@@ -228,7 +238,7 @@ switch(this.currentChar) {
         end: this.pos - 1,
       };
 		}
-		
+
 		// Symbol =
 		this.pos++;
     return {
