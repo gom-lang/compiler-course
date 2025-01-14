@@ -1,5 +1,6 @@
 ---
 title: The Magic of Language Synthesis
+cover: ./images/synthesis.jpg
 ---
 
 ![synthesis](./images/synthesis.jpg)
