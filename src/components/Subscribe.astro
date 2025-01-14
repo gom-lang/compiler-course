@@ -1,0 +1,32 @@
+---
+import { Card } from "@astrojs/starlight/components";
+---
+<script>
+  const subscribedToUpdates = localStorage.getItem('subscribedToUpdates');
+  if(subscribedToUpdates !== 'true') {
+    const form = document.querySelector('.embeddable-buttondown-form') as HTMLFormElement;
+    form.style.display = 'block';
+  } else {
+    const alreadySubscribed = document.querySelector('#alreadySubscribed') as HTMLParagraphElement;
+    alreadySubscribed.style.display = 'block';
+  }
+</script>
+<div>
+  <Card title="Subscribe to updates">
+    
+  <form
+  action="https://buttondown.com/api/emails/embed-subscribe/compiler-in-typescript"
+  method="post"
+  target="popupwindow"
+  class="embeddable-buttondown-form"
+  onsubmit="localStorage.setItem('subscribedToUpdates', 'true');"
+  style="display: none;"
+>
+  <label for="bd-email">I send email updates when available! Subscribe with your email:</label>
+  <input style="display: block;margin-top: 5px;width:300px" type="email" name="email" id="bd-email" placeholder="Your email" />
+  <input style="display: block;margin-top: 10px;" type="submit" value="Subscribe" />
+</form>
+<p id="alreadySubscribed" style="display: none;">✅ You are already subscribed!</p>
+</Card>
+
+</div>
