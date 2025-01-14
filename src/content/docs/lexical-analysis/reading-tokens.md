@@ -2,19 +2,25 @@
 title: Reading Tokens
 ---
 
+<style>
+    img:first-of-type { background-color: white; }
+</style>
+
+![Tokens](./images/tokens.png)
+
 The first stage of a compiler is lexical analysis, where the program text is read and converted into a set of *lexemes* or *tokens* according to the language grammar. These tokens are important in order to do further processing, they convert plain text to a sequence of meaningful pieces which then can be read by the parser to derive logical meaning. This stage at times can be skipped if you decide to use tools like *parser generators*. These tools automatically generate code for parsers (with a lexical analyser) from the language grammar. In our journey of building the Gom compiler, we’ll create a lexical analyser (also called lexer/scanner in short) ourselves, but if you are already aware of this process, you can take the parser generator path of this journey. We’ll meet again during intermediate representation generation.
 
 ## Defining Token Types
 
 To begin, we’ll create a directory named `lexer` in `src` . The index file will contain the lexer class and `src/lexer/tokens.ts`  will contain a TypeScript enum of all Gom tokens. Let’s start by defining tokens from the EBNF grammar we created in the last chapter. Think of tokens as meaningful words in a paragraph. We ideally want to create tokens out of syntactically distinct group of characters. E.g. consider the following line.
 
-```tsx
-import io;
+```gom
+import "io";
 ```
 
-While reading this line (as a human), we interpret `import` and `io` as two distinct words, and expect the language to assign suitable meaning to each of them. Similarly, in the following line, even when whitespace does not separate characters, they ideally are distinct.
+While reading this line (as a human), we interpret `import` and `"io"` as two distinct items, and expect the language to assign suitable meaning to each of them. Similarly, in the following line, even when whitespace does not separate characters, they ideally are distinct.
 
-```tsx
+```gom
 io.log("Hello, world!");
 ```
 

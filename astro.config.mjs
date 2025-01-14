@@ -1,16 +1,19 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import gomLang from './gom.textmate.json';
+import partytown from '@astrojs/partytown';
 
 // https://astro.build/config
 export default defineConfig({
 	redirects: {
-		'/': '/welcome/language-synthesis',
+		'/': '/welcome/start',
 	},
 	markdown: {
 		shikiConfig: {
 			langs: [
-
+				// @ts-ignore
+				gomLang
 			]
 		}
 	},
@@ -20,6 +23,27 @@ export default defineConfig({
 			social: {
 				github: 'https://github.com/gom-lang/compiler-course',
 			},
+			head: [
+				{
+					tag: 'script',
+					attrs: {
+						src: 'https://www.googletagmanager.com/gtag/js?id=G-QMC0BNP18V',
+						type: 'text/partytown',
+						async: true
+					}
+				},
+				{
+					tag: 'script',
+					content: `window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-QMC0BNP18V');`,
+					attrs: {
+						type: 'text/partytown'
+					}
+				}
+			],
 			sidebar: [
 				{
 					label: 'Hello, World!',
@@ -58,6 +82,13 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'Advanced Topics',
+					items: [
+						{ label: 'Introduction', slug: 'advanced/introduction' },
+						{ label: 'Complex Data Structures', slug: 'advanced/complex-data-structures' },
+					]
+				},
+				{
 					label: 'Reference',
 					items: [
 						{ label: 'Gom Language Grammar', slug: 'reference/gom-ebnf' },
@@ -72,5 +103,10 @@ export default defineConfig({
 				'@fontsource/ibm-plex-mono/600.css',
 			],
 		}),
+		partytown({
+			config: {
+				forward: ["dataLayer.push"]
+			}
+		})
 	],
 });

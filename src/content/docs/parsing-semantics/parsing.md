@@ -1,3 +1,15 @@
 ---
 title: Parsing & Abstract Syntax Trees
 ---
+
+The first phase of the compiler gave us a list of tokens. Lexical analysis read the input text and broke it down into Gom-aware _tokens_. In this chapter, we'll understand **parsing** - the process of understanding _structure_ in the input program. Structure helps us, the language implementors, know what the programmer desires to do in the program, and then act accordingly.
+
+A language's structure, also called its _syntax_, is defined by its grammar. In this course, we are implementing the lexical analyser and the parser by hand, which often is done using tools called parser generators. They take the language grammar as input and produce code for lexer and parser as output. Here, we'll take the more manual route to get the feel of writing a parser from scratch.
+
+## Representing syntax
+
+Syntax, _the study of how words and morphemes combine to form larger units such as phrases and sentences_ ([Wikipedia](https://en.wikipedia.org/wiki/Syntax)), has to be represented in order to work with it in later phases of the compiler.
+
+## Next token, which one?
+
+Out of many different kinds of parsers, we'll focus on a particular one called **recursive descent parser**. As the name suggests, this kind uses recursion and _descends_ down _something_.

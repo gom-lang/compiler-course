@@ -2,12 +2,22 @@
 title: Introduction to Gom
 ---
 
-**Gom** is a statically typed, multi-paradigm programming language based on a subset of the ECMAScript (and Rust) syntax but providing type-safety and concise syntax. It can be interpreted or compiled to LLVM IR. It takes inspiration from AssemblyScript and makes it more approachable to learn compiler construction.
+import { Aside } from "@astrojs/starlight/components";
+
+![dune](./images/dune.jpg)
+[_Image by Oleksandr Ryzhkov on Freepik_](https://www.freepik.com/free-photo/stars-night-dunes-sahara-desert-morocco_27263849.htm#fromView=search&page=3&position=7&uuid=2d74736c-8b36-4428-9c22-db8e24b67496)
+
+**Gom** is a statically typed programming language based on a subset of the ECMAScript (and Rust) syntax but providing type-safety and concise syntax. It can be interpreted or compiled to LLVM IR. It takes inspiration from AssemblyScript and makes it more approachable to learn compiler construction.
+
+<Aside title="Trivia: Gom & Dune">
+  The name _Gom_ is a nerdy reference to the _Gom Jabbar_ from the _Dune_ series
+  by Frank Herbert.
+</Aside>
 
 Here’s a typical hello world program in Gom:
 
 ```gom
-import io;
+import "io";
 
 fn main() {
 	io.log("Hello, world!");
@@ -18,8 +28,8 @@ The `main` function is the entry point to the program, similar to other statical
 
 Simple arithmetic and function declaration looks like this:
 
-```
-import io;
+```gom
+import "io";
 
 fn add(a: i8, b: i8): i8 {
 	return a + b;
@@ -32,15 +42,15 @@ fn main() {
 
 Defining complex data structures is possible via the `struct` notation (like `struct` in C/Rust/Go). `let` is the variable declaration keyword, it infers type from the expression on the right hand side of `=`.
 
-```
-import io;
+```gom
+import "io";
 
 type ArrInt = i8[10]; // i8 | i8[10] | struct {} | Temp[10]
 
 type Temperature = struct {
 	high: i8,
 	low: i8,
-	avg: i8 
+	avg: i8
 };
 
 fn main() {
@@ -59,7 +69,7 @@ fn main() {
 
 Apart from the built-in types, custom types can be created using the `type` keyword.
 
-```
+```gom
 type LikeInt = i8;
 type IntOrFloat = i8 | f32
 ```

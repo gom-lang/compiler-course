@@ -4,12 +4,16 @@ description: Learn how to write a compiler in TypeScript from scratch
 ---
 
 import { Code } from "@astrojs/starlight/components";
+import { Aside } from "@astrojs/starlight/components";
+
+![dragons](./images/dragons.jpg)
+[_Image by freepik_](https://www.freepik.com/free-vector/hand-drawn-dragon-boat-collection_13685906.htm#fromView=search&page=1&position=2&uuid=de2651bd-0f3a-4e73-989e-ac0c0f7896c3)
 
 Compilers! Aren't they fascinating? If you've ever thought about how they worked and about building one, welcome! These set of pages are for you. We'll be building a compiler from scratch for a toy language called **Gom** - a language with a simple, familiar syntax.
 
 <Code
 code={`
-import io;
+import "io";
 
 fn main() {
 \tio.log("Hello, World!");
@@ -17,6 +21,16 @@ fn main() {
 lang="rust"
 title="hello_world.gom"
 />
+
+<Aside title="Trivia: Compilers and dragons 🐉">
+  A popular analogy compares compilers to dragons, probably because they are
+  complex, mysterious and powerful. Writing a compiler is probably like taming a
+  dragon. The so called ["Dragon
+  Book"](https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools)
+  is a popular textbook on compilers and the cover illustration shows a dragon.
+  Fortunately, several books (hopefully including this one) try to make the art
+  of writing compilers easy and approachable.
+</Aside>
 
 ## What will we be building?
 
@@ -28,6 +42,10 @@ In our journey, we'll go through various phases of a compiler:
 - **Parsing**: Read the tokens in their order and make sense of the structure of the code
 - **Semantic Analysis**: Understand the meaning of the code and check for errors, e.g. type mismatches
 - **Code Generation**: Convert the AST into LLVM IR
+
+We'll approach each topic directly with code to remove any fluff and to help you understand the concepts quickly. Well, writing a compiler isn't that hard honestly! The hard parts are in the details, and you can go as deep as you want. The initial four chapters cover what you need to implement a basic compiler, something that would give you your own toy language in the end.
+
+If you like the journey, you can decide to then explore the advanced chapters (Chapter 5 and beyond) that cover more complex topics like type systems, optimizations, and more.
 
 ## Why TypeScript?
 

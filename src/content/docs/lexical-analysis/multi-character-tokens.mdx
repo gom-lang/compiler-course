@@ -4,9 +4,9 @@ title: Multi-character Tokens
 
 import { LinkCard } from "@astrojs/starlight/components";
 
-We can extend the concept of reading two-character symbols to those which contain more than two characters. Tokens like keywords and identifiers can contain varying number of characters and need to be handled in a special way. Let’s use the `default` block of the switch statement to implement this logic.
+We can extend the concept of reading two-character symbols to those which contain more than two characters. Tokens like keywords and identifiers, e.g. `import`, `true` or `false`, contain varying number of characters and need to be handled in a special way. Let’s use the `default` block of the switch statement to implement this logic.
 
-**Identifiers and keywords**
+## Identifiers and keywords
 
 ```tsx
 switch (this.currentChar) {
@@ -61,7 +61,7 @@ To match an identifier or a keyword, we first test if the starting character mat
 
 Once we have the token, we check if it matches any Gom keyword or primitive type name and return the corresponding token. If it doesn’t, we return an `GomType.IDENTIFIER` token. Identifiers denote any user-defined values like variable and function names, function arguments, custom types and package names.
 
-**Literals**
+## Literals
 
 The [Gom syntax](https://www.notion.so/Design-types-semantics-the-Gom-EBNF-grammar-2aac5f5938544cac80dfd3d59f726472?pvs=21) states that the language has two types of literals — string and numeric. These can be handled similar to keywords and identifiers. The characteristic of a string literal is that it is always enclosed in `" "` , and that of numeric literal is that all of its characters are digits. This information helps in writing the logic to scan them.
 
