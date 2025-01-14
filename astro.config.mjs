@@ -56,7 +56,7 @@ export default defineConfig({
 					label: 'The Gom Programming Language',
 					items: [
 						{ label: 'Introduction to Gom', slug: 'gom-language/introduction' },
-						{ label: 'Syntax and Feel', slug: 'gom-language/syntax' },
+						{ label: '⏳ Syntax and Feel', slug: 'gom-language/syntax' },
 					]
 				},
 				{
@@ -69,23 +69,23 @@ export default defineConfig({
 				{
 					label: 'Parsing and Semantics',
 					items: [
-						{ label: 'Parsing & Abstract Syntax Trees', slug: 'parsing-semantics/parsing' },
-						{ label: 'A Simple Type System', slug: 'parsing-semantics/type-system' },
-						{ label: 'Semantic Analysis', slug: 'parsing-semantics/semantic-analysis' },
+						{ label: '⏳ Parsing & Abstract Syntax Trees', slug: 'parsing-semantics/parsing' },
+						{ label: '⏳ A Simple Type System', slug: 'parsing-semantics/type-system' },
+						{ label: '⏳ Semantic Analysis', slug: 'parsing-semantics/semantic-analysis' },
 					]
 				},
 				{
 					label: 'Code Generation',
 					items: [
-						{ label: 'Introduction to LLVM', slug: 'codegen/intro-to-llvm' },
-						{ label: 'Generating LLVM IR', slug: 'codegen/generating-llvm-ir' },
+						{ label: '⏳ Introduction to LLVM', slug: 'codegen/intro-to-llvm' },
+						{ label: '⏳ Generating LLVM IR', slug: 'codegen/generating-llvm-ir' },
 					]
 				},
 				{
 					label: 'Advanced Topics',
 					items: [
-						{ label: 'Introduction', slug: 'advanced/introduction' },
-						{ label: 'Complex Data Structures', slug: 'advanced/complex-data-structures' },
+						{ label: '⏳ Introduction', slug: 'advanced/introduction' },
+						{ label: '⏳ Complex Data Structures', slug: 'advanced/complex-data-structures' },
 					]
 				},
 				{

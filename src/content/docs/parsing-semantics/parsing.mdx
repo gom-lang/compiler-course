@@ -2,6 +2,12 @@
 title: Parsing & Abstract Syntax Trees
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="caution" title="Coming soon ⏳">
+  This chapter is a work in progress.
+</Aside>
+
 The first phase of the compiler gave us a list of tokens. Lexical analysis read the input text and broke it down into Gom-aware _tokens_. In this chapter, we'll understand **parsing** - the process of understanding _structure_ in the input program. Structure helps us, the language implementors, know what the programmer desires to do in the program, and then act accordingly.
 
 A language's structure, also called its _syntax_, is defined by its grammar. In this course, we are implementing the lexical analyser and the parser by hand, which often is done using tools called parser generators. They take the language grammar as input and produce code for lexer and parser as output. Here, we'll take the more manual route to get the feel of writing a parser from scratch.
