@@ -74,3 +74,150 @@ Apart from the built-in types, custom types can be created using the `type` keyw
 type LikeInt = i8;
 type IntOrFloat = i8 | f32
 ```
+
+## Formalizing Syntax
+
+The above examples give you a taste of the Gom language in general, how do we formally define the syntax of the language though? A formal definition is crucial for anyone wanting to implement the language (e.g. us) and is looking for language rules that the compiler should adhere to. This representation is called the **grammar** of the language, just like human language define rules in their grammar.
+
+One of the popular ways to write language grammars is the [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form), a.k.a. BNF. The form uses a set of terminal and non-terminal symbols to define the syntax of the language. Let's take a simple example of arithmetic - assume our language only had one type of expression: arithemetic addition. BNF would define the grammar as follows (let's assume addition with only two operands):
+
+```txt title=addition.bnf
+<program>		::= <addition>
+<addition> 	::= <term> + <term>
+<term>			 ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+```
+
+Each line is a _rule_, left hand side being the rule name, right hand side being the sequence of symbols the rule expands into. `<program>` and `<addition>` are non-terminal symbols as they expand into further symbols and `<term>` is a terminal as its value is a static string (single character here).
+
+In this way, you can go on defining the grammar for more features in the language. Let's take another example before we see the entire Gom grammar. The following set of rules represent function definition in a modified [Extended Backus-Naur Form](https://ics.uci.edu/~pattis/misc/ebnf2.pdf), a superset of BNF with added syntax for common rules:
+
+```txt title=functionDefinition.ebnf
+functionDefinition = "fn" , identifier , "(" , argumentItem* , ")" ,
+						functionReturnType? ,
+						"{" , statement+ , "}";
+```
+
+To compare again with a function definition in Gom:
+
+```gom title=addition.gom
+fn add(a: i8, b: i8): i8 {
+	return a + b;
+}
+```
+
+Here, `,` represents sequence and you can also see some special characters like `*`, `?` and `+`. If you know a bit of regular expressions, you might connect the dots and guess what these mean.
+
+```
+* -> Repetition, 0 or more
++ -> Repetition, 1 or more
+? -> Optional, 0 or 1
+| -> Choice, one of many
+```
+
+The function definition in plain English would be something like:
+
+```txt
+functionDefinition is made up of:
+	- "fn" Keyword
+	- an identifier
+	- a "(" token
+	- zero or more argumentItems (expands to: argumentName ":" type ",")
+	- a ")" token
+	- an optional functionReturnType
+	- a "{" token (body block)
+	- one or more statements
+	- a "}" token (end body block)
+```
+
+## Complete Grammar for Gom
+
+Okay, hopefully that gives a good idea about how language grammars can be written and read. Following is the complete language grammar for Gom:
+
+```txt title="Gom EBNF grammar"
+program = importDeclaration* , typeOrFunctionDefinition* , mainFunction;
+
+importDeclaration = "import" , stringLiteral , ";";
+
+typeOrFunctionDefinition = typeDefinition | functionDefinition;
+
+typeDefinition = "type" , identifier , "=" , gomType , ";";
+
+functionDefinition = "fn" , identifier , "(" , argumentItem* , ")" , functionReturnType? ,
+  "{" , statement+ , "}";
+
+mainFunction = "fn" , "main" , "(" , argumentItem* , ")" , functionReturnType? ,
+  "{" , statement+ , "}";
+
+statement = ifStatement
+  | forStatement
+  | returnStatement
+  | letStatement
+  | expressionStatement;
+
+forStatement = "for" , "(" , expr? , ";" , expr? , ";" , expr? , ")" , "{" , statement+ , "}";
+
+returnStatement = "return" , expr , ";";
+
+letStatement = "let" , assignment+ , ";";
+
+constStatement = "const" , assignment+ , ";";
+
+expressionStatement = expr , ";";
+
+gomType = typeIdOrArray | structType;
+
+typeIdOrArray = typeId ("[" , numLiteral , "]")?;
+
+structType = "struct" , "{" , structTypeItem+ , "}";
+
+structTypeItem = identifier , ":" , gomType , ","?;
+
+argumentItem = identifier , ":" , gomType , ","?;
+
+functionReturnType = ":" , gomType;
+
+assignment = identifier , "=" , expr;
+
+(* Precedence *)
+
+expr = assignment;
+
+(* (identifier , ".")? is not implemented yet *)
+assignment = (identifier , ".")? , identifier ,  "=" , assignment
+  | comparison;
+
+comparison = sum , (("<" | ">" | "<=" | ">=" | "==") , comparison)?;
+
+sum = quot , (("+" | "-") , quot)?;
+
+quot = expo , (("/" | "*") , expo)?;
+
+expo = call , ("^" , call)?;
+
+call = term , ("(" , expr? , (expr , ",")* , ")" | "." call)?;
+
+term = identifier | numLiteral | stringLiteral | "(" , expr , ")" | "true" | "false";
+
+identifier = letter , (letter | digit)*;
+
+numLiteral = digit+;
+
+stringLiteral = '"' , (letter | digit)* , '"';
+
+primitiveType = "i8" | "bool" | "f32" | "str" | "void";
+
+compositeType = identifier;
+
+letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       | "x" | "y" | "z" ;
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+WHITESPACE = " " | \n | \r | \t;
+```
