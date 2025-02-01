@@ -3,6 +3,8 @@
 
 /_astro/*
   ! Cache-Control
+
+/_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
 https://:project.pages.dev/*
