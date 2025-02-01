@@ -114,4 +114,7 @@ gtag('config', 'G-QMC0BNP18V');`,
 			forward: ["dataLayer.push"]
 		}
 	}), sitemap()],
+	experimental: {
+		svg: true,
+	}
 });

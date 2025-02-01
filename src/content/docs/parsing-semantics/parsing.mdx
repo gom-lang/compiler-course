@@ -3,6 +3,8 @@ title: Parsing & Abstract Syntax Trees
 ---
 
 import ComingSoon from "./../../../components/ComingSoon.astro";
+import ParsedMentalRep from "./images/mental-representation.svg";
+import LetTree from "./images/let-tree.svg";
 
 <ComingSoon />
 
@@ -10,10 +12,44 @@ The first phase of the compiler gave us a list of tokens. Lexical analysis read 
 
 A language's structure, also called its _syntax_, is defined by its grammar. In this course, we are implementing the lexical analyser and the parser by hand, which often is done using tools called parser generators. They take the language grammar as input and produce code for lexer and parser as output. Here, we'll take the more manual route to get the feel of writing a parser from scratch.
 
-## Representing syntax
+## Representing Syntax
 
-Syntax, _the study of how words and morphemes combine to form larger units such as phrases and sentences_ ([Wikipedia](https://en.wikipedia.org/wiki/Syntax)), has to be represented in order to work with it in later phases of the compiler.
+A parser's job is to read the tokens from the lexer and form a representation of the source program that makes it possible to programmatically interprete or operate on the source. It is yet another step in the compiler pipeline and hence the output from a parser will be used by the following steps, e.g. semantic analysis and code generation.
 
-## Next token, which one?
+Let's take a simple example before we come to parsing complete Gom programs. In fact, the following example is exactly the same if you write it in TypeScript.
 
-Out of many different kinds of parsers, we'll focus on a particular one called **recursive descent parser**. As the name suggests, this kind uses recursion and _descends_ down _something_.
+```gom title='A simple variable declaration or a "let statement"'
+let a = 1 + 2;
+```
+
+The above code, when passed through a lexical analyser, would produce these tokens:
+
+> `let`, `a`, `=`, `1`, `+`, `2`, `;`
+
+When you write this piece of code, you have a mental model that describes what's happening here: _a variable named `a` is being initialised with the value resulting from the addition expression `1 + 2`_. And this is similar to what the language would interprete adhering to its specification (grammar).
+
+In the chapter [Introduction to Gom](/gom-language/introduction/) we discussed examples from the Gom grammar, and here is how it represents a "let statement" and subsequent rules that it expands into (I've simplified the grammar slightly e.g. the `expr` rule expands only into `addition`):
+
+```txt title='Subset of Gom grammar: the letStatement'
+letStatement = "let" , assignment+ , ";";
+assignment   = identifier , "=" , expr;
+expr         = addition;
+addition     = term "+" term;
+term         = identifier | numLiteral
+identifier   = letter , (letter | digit)*;
+numLiteral   = digit+;
+```
+
+Visually, the expansion of rules looks like follows:
+
+<ParsedMentalRep />
+
+### Rules and Hierarchy - Introducing Syntax Trees
+
+If you look closely at the figure above, the let statement can be represented as a hierarchical collection of rules and terminals.
+
+<LetTree size={400} />
+
+This hierarchical representation is called a **syntax tree**. It is a tree data structure that represents the structure of the source code where each node represents a rule in the grammar, the children of the node represent the expansion of that rule and the leaves represent the terminal symbols. Syntax trees are crucial in the analysis and code generation phases of the compilers.
+
+### Code
