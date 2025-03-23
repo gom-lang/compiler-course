@@ -7,15 +7,18 @@ cover: ./images/dragons.jpg
 import { Code } from "@astrojs/starlight/components";
 import { Aside } from "@astrojs/starlight/components";
 import Subscribe from "../../../components/Subscribe.astro";
+import { Image } from "astro:assets";
+import cover from "./images/cover.jpg";
 
-![dragons](./images/dragons.jpg)
-[_Image by freepik_](https://www.freepik.com/free-vector/hand-drawn-dragon-boat-collection_13685906.htm#fromView=search&page=1&position=2&uuid=de2651bd-0f3a-4e73-989e-ac0c0f7896c3)
+<Image src={cover} alt="Cover image for Writing a Compiler in TypeScript" />
+
+<Subscribe />
 
 Compilers! Aren't they fascinating? If you've ever thought about how they worked and about building one, welcome! These set of pages are for you. We'll be building a compiler from scratch for a toy language called **Gom** - a language with a simple, familiar syntax.
 
 <Code
 code={`
-import "io";
+import io;
 
 fn main() {
 \tio.log("Hello, World!");
@@ -68,5 +71,3 @@ Phil Eaton quotes a beautiful message that talks about avoiding the confusion of
 ## Course Updates
 
 I am still writing the course and am releasing chapters as they are ready. If you'd like to be notified when new content is available, you can subscribe to the email list below. I promise not to spam you, and you can unsubscribe anytime.
-
-<Subscribe />

@@ -3,7 +3,7 @@ title: Reading Tokens
 ---
 
 import { Image } from "astro:assets";
-import { FileTree } from "@astrojs/starlight/components";
+import { FileTree, Aside } from "@astrojs/starlight/components";
 import tokensImage from "./images/tokens.png";
 
 <Image src={tokensImage} alt="Tokens" style="background:white" />
@@ -26,10 +26,10 @@ To begin, we’ll create a directory named `lexer` in `src` . The index file wil
 Let’s start by defining tokens from the EBNF grammar we created in the last chapter. Think of tokens as meaningful words in a paragraph. We ideally want to create tokens out of syntactically distinct group of characters. E.g. consider the following line.
 
 ```gom
-import "io";
+import io;
 ```
 
-While reading this line (as a human), we interpret `import` and `"io"` as two distinct items, and expect the language to assign suitable meaning to each of them. Similarly, in the following line, even when whitespace does not separate characters, they ideally are distinct.
+While reading this line (as a human), we interpret `import` and `io` as two distinct items, and expect the language to assign suitable meaning to each of them. Similarly, in the following line, even when whitespace does not separate characters, they ideally are distinct.
 
 ```gom
 io.log("Hello, world!");
@@ -249,4 +249,34 @@ switch(this.currentChar) {
 }
 ```
 
-Rest of the tokens containing one and two characters can be handled in a similar way.
+Rest of the tokens containing one and two characters can be handled in a similar way. Let's try to run our lexer code - update `index.ts` with the following:
+
+```ts title=src/index.ts
+export default function main(filePath: string) {
+  const src = readFileSync(filePath, "utf-8");
+  const lexer = new Lexer(src);
+
+  let token = lexer.nextToken();
+  while (token.type !== GomToken.EOF) {
+    console.log(token);
+    token = lexer.nextToken();
+  }
+
+  console.log(program);
+}
+```
+
+<Aside type="tip" title="Ready to Run">
+Create a new test file `test.gom` and add some code there:
+
+```txt title=test.gom
+let a = 1 + 2;
+```
+
+And then run:
+
+```bash
+npm run compile test.gom
+```
+
+</Aside>

@@ -3,10 +3,11 @@ title: Introduction to Gom
 cover: ./images/dune.jpg
 ---
 
+import { Image } from "astro:assets";
 import { Aside } from "@astrojs/starlight/components";
+import cover from "./images/gom.jpg";
 
-![dune](./images/dune.jpg)
-[_Image by Oleksandr Ryzhkov on Freepik_](https://www.freepik.com/free-photo/stars-night-dunes-sahara-desert-morocco_27263849.htm#fromView=search&page=3&position=7&uuid=2d74736c-8b36-4428-9c22-db8e24b67496)
+<Image src={cover} alt="Gom" />
 
 **Gom** is a statically typed programming language based on a subset of the ECMAScript (and Rust) syntax but providing type-safety and concise syntax. It can be interpreted or compiled to LLVM IR. It takes inspiration from AssemblyScript and makes it more approachable to learn compiler construction.
 
@@ -18,7 +19,7 @@ import { Aside } from "@astrojs/starlight/components";
 Here’s a typical hello world program in Gom:
 
 ```gom
-import "io";
+import io;
 
 fn main() {
 	io.log("Hello, world!");
@@ -30,9 +31,9 @@ The `main` function is the entry point to the program, similar to other statical
 Simple arithmetic and function declaration looks like this:
 
 ```gom
-import "io";
+import io;
 
-fn add(a: i8, b: i8): i8 {
+fn add(a: int, b: int): int {
 	return a + b;
 }
 
@@ -44,18 +45,18 @@ fn main() {
 Defining complex data structures is possible via the `struct` notation (like `struct` in C/Rust/Go). `let` is the variable declaration keyword, it infers type from the expression on the right hand side of `=`.
 
 ```gom
-import "io";
+import io;
 
-type ArrInt = i8[10]; // i8 | i8[10] | struct {} | Temp[10]
+type ArrInt = List<int>;
 
-type Temperature = struct {
-	high: i8,
-	low: i8,
-	avg: i8
+type Temperature = {
+	high: int,
+	low: int,
+	avg: int
 };
 
 fn main() {
-	let a = 1; // type inferred as i8
+	let a = 1; // type inferred as int
 	io.log("a:", a);
 
 	let temperature = Temperature {
@@ -71,8 +72,8 @@ fn main() {
 Apart from the built-in types, custom types can be created using the `type` keyword.
 
 ```gom
-type LikeInt = i8;
-type IntOrFloat = i8 | f32
+type LikeInt = int;
+type IntOrFloat = int | float
 ```
 
 ## Formalizing Syntax
@@ -100,7 +101,7 @@ functionDefinition = "fn" , identifier , "(" , argumentItem* , ")" ,
 To compare again with a function definition in Gom:
 
 ```gom title=addition.gom
-fn add(a: i8, b: i8): i8 {
+fn add(a: int, b: int): int {
 	return a + b;
 }
 ```
@@ -204,7 +205,7 @@ numLiteral = digit+;
 
 stringLiteral = '"' , (letter | digit)* , '"';
 
-primitiveType = "i8" | "bool" | "f32" | "str" | "void";
+primitiveType = "int" | "bool" | "float" | "str" | "void";
 
 compositeType = identifier;
 

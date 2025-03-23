@@ -76,7 +76,8 @@ gtag('config', 'G-QMC0BNP18V');`,
 			{
 				label: 'Parsing and Semantics',
 				items: [
-					{ label: '⏳ Parsing & Abstract Syntax Trees', slug: 'parsing-semantics/parsing' },
+					{ label: 'Parsing & ASTs', slug: 'parsing-semantics/parsing-1' },
+					{ label: '⏳ Parsing Continued', slug: 'parsing-semantics/parsing-2' },
 					{ label: '⏳ A Simple Type System', slug: 'parsing-semantics/type-system' },
 					{ label: '⏳ Semantic Analysis', slug: 'parsing-semantics/semantic-analysis' },
 				]

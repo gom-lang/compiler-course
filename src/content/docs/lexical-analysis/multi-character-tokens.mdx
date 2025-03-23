@@ -2,7 +2,7 @@
 title: Multi-character Tokens
 ---
 
-import { LinkCard } from "@astrojs/starlight/components";
+import { LinkCard, Aside } from "@astrojs/starlight/components";
 
 We can extend the concept of reading two-character symbols to those which contain more than two characters. Tokens like keywords and identifiers, e.g. `import`, `true` or `false`, contain varying number of characters and need to be handled in a special way. Let’s use the `default` block of the switch statement to implement this logic.
 
@@ -97,6 +97,22 @@ switch(this.currentChar) {
 ```
 
 Similarly, number literals can be matched using `/[0-9]/` expression.
+
+<Aside type="tip" title="Ready to Run">
+Update the test file `test.gom` with some multi-character tokens:
+
+```txt title=test.gom
+let sum = 1 + 2;
+let str = "Hello, world!";
+```
+
+And then run:
+
+```bash
+npm run compile test.gom
+```
+
+</Aside>
 
 <LinkCard
   title="gom/src/lexer/index.ts"

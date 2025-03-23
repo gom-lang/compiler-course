@@ -1,0 +1,298 @@
+---
+title: Parsing & Abstract Syntax Trees
+sidebar:
+  label: Parsing & ASTs
+  badge:
+    text: New ✨
+---
+
+import ComingSoon from "./../../../components/ComingSoon.astro";
+import ParsedMentalRep from "./images/mental-representation.svg";
+import LetTree from "./images/let-tree.svg";
+import { FileTree, Aside, Badge } from "@astrojs/starlight/components";
+import cover from "./images/cover.jpg";
+import { Image } from "astro:assets";
+
+<Image src={cover} alt="Cover" style="background:white" />
+
+The first phase of the compiler gave us a list of tokens. Lexical analysis read the input text and broke it down into Gom-aware _tokens_. In this chapter, we'll understand **parsing** - the process of understanding _structure_ in the input program. Structure helps us, the language implementors, know what the programmer desires to do in the program, and then act accordingly.
+
+A language's structure, also called its _syntax_, is defined by its grammar. In this course, we are implementing the lexical analyser and the parser by hand, which often is done using tools called parser generators. They take the language grammar as input and produce code for lexer and parser as output. Here, we'll take the more manual route to get the feel of writing a parser from scratch.
+
+## Representing Syntax
+
+A parser's job is to read the tokens from the lexer and form a representation of the source program that makes it possible to programmatically interprete or operate on the source. It is yet another step in the compiler pipeline and hence the output from a parser will be used by the following steps, e.g. semantic analysis and code generation.
+
+Let's take a simple example before we come to parsing complete Gom programs. In fact, the following example is exactly the same if you write it in TypeScript.
+
+```gom title='A simple variable declaration or a "let statement"'
+let a = 1 + 2;
+```
+
+The above code, when passed through a lexical analyser, would produce these tokens:
+
+> `let`, `a`, `=`, `1`, `+`, `2`, `;`
+
+When you write this piece of code, you have a mental model that describes what's happening here: _a variable named `a` is being initialised with the value resulting from the addition expression `1 + 2`_. And this is similar to what the language would interprete adhering to its specification (grammar).
+
+In the chapter [Introduction to Gom](/gom-language/introduction/) we discussed examples from the Gom grammar, and here is how it represents a "let statement" and subsequent rules that it expands into (I've simplified the grammar slightly e.g. the `expr` rule expands only into `addition`):
+
+```txt title='Subset of Gom grammar: the letStatement'
+letStatement = "let" , assignment+ , ";";
+assignment   = identifier , "=" , expr;
+expr         = addition;
+addition     = term "+" term;
+term         = identifier | numLiteral
+identifier   = letter , (letter | digit)*;
+numLiteral   = digit+;
+```
+
+Visually, the expansion of rules looks like follows:
+
+<ParsedMentalRep />
+
+### Abstract Syntax Trees
+
+If you look closely at the figure above, the let statement can be represented as a hierarchical collection of rules and terminals.
+
+<LetTree size={400} />
+
+This hierarchical representation is called a **syntax tree**. It is a tree data structure that represents the structure of the source code where each node represents a rule in the grammar, the children of the node represent the expansion of that rule and the leaves represent the terminal symbols. The word _abstract_ is often used with syntax trees because the data structure does not hold all the details present in the source program, but only the important parts that will be useful in next phases of the compiler. Abstract Syntax Trees (or ASTs) are crucial in the analysis and code generation phases of the compilers.
+
+### Identifying and Matching Syntax
+
+We now know that ASTs are valuable in representing syntax in a way that can be operated on in the compiler. But how do we arrive at an AST? How do we build them? Here comes the role of a _parser_. A parser reads primitive tokens from the lexer, identifies them and tries to match them according to the language rules. While doing so, it constructs the AST, each _node_ of the tree being a high-level representation of a particular syntax.
+
+Let's take the same example from above, we have the following tokens from the lexer:
+
+```ts
+let a = 1 + 2; // ➡ `let`, `a`, `=`, `1`, `+`, `2`, `;`
+```
+
+The pseudocode for a parser matching a `let` expression would look like:
+
+```
+Parser:
+  parseLetStatement():
+    MATCH LET
+    assignment = parseAssignment()
+    MATCH SEMICOLON
+    return LetStatement([assignment])
+
+  parseAssignment():
+    MATCH identifier
+    MATCH EQ
+    addition = parseAddition()
+    return Assignment(identifier, addition)
+
+  parseAddition():
+    MATCH left
+    MATCH PLUS
+    MATCH right
+    return Addition(left, right)
+```
+
+The methods `parseLetStatement`, `parseAssignment` and `parseAddition` each parse a subset of the syntax and return a node, composing a structure as they return up the hierarchy. When the `parseLetStatement()` method is called, you can expect to receive a structure of type `LetStatement` which has a reference to an array of elements of type `Assignment` which in-turn holds references to `identifier` and `Addition`.
+
+What we did above is called **recursive descent parsing**, and you may have guessed why. We recursively descend into the syntax, parse it and build an abstract syntax tree (AST).
+
+## Writing a Parser
+
+Let's write some code now. Create a new directory inside `src` called `parser` and a file `src/parser/index.ts`. We'll write the parser here.
+
+<FileTree>
+
+- src
+  - parser/
+    - index.ts
+
+</FileTree>
+
+```ts title=src/parser/index.ts
+export class Parser {
+  lexer: Lexer;
+  buffer: Token[];
+
+  constructor(lexer: Lexer) {
+    this.lexer = lexer;
+    this.buffer = [this.lexer.nextToken()];
+  }
+
+  get token() {
+    return this.buffer[0];
+  }
+
+  private nextToken() {
+    this.buffer.shift();
+    if (this.buffer.length === 0) {
+      this.buffer.push(this.lexer.nextToken());
+    }
+  }
+
+  parse() {
+    // todo
+  }
+}
+```
+
+The code above represents a basic parser that does nothing at the moment. It has two properties:
+
+- `lexer`: Holds the instance to the lexer
+- `buffer`: An array of tokens that will be used by the parser to process the input program
+- `get token()`: A getter that points to the 0th index of the buffer (the first element) - this is the current token being processed by the parser
+- `nextToken()`: This is a utility function that advances the parser by one token. It removes the first element from the buffer and adds a new token from the lexer if buffer is empty.
+- `parse()`: The main entry point to invoke parsing. This will be called from outside the parser.
+
+Let's start extending the parser by adding a set of important utility functions. In the pseudocode, we saw that we need a way to _MATCH_ tokens. Let's add three methods that will help us do that.
+
+```ts title=src/parser/index.ts
+export class Parser {
+  // ...
+  match(type: GomToken) {
+    if (this.token.type === type) {
+      const matched = this.token;
+      this.nextToken();
+      return matched;
+    } else {
+      throw {
+        message: `Unexpected token: ${this.token.value}`,
+        loc: this.token.start,
+      };
+    }
+  }
+
+  private accept(type: GomToken) {
+    if (this.token.type === type) {
+      this.nextToken();
+      return true;
+    }
+    return false;
+  }
+
+  private peek(type: GomToken) {
+    return this.token.type === type;
+  }
+}
+```
+
+`match(type)`: This method helps us _match_ a particular token and if successfully matched, the parser moves one token ahead. If not, it throws an error - a **syntax error** because we found a token that we did not expect as per the language syntax.
+
+`accept(type)`: This is similar to match, but in case of failure, it returns `false` without throwing an error - a useful way to conditionally move ahead.
+
+`peek(type)`: Simply checks if the current token matches the given type without modifying the state of the parser.
+
+Let's start with the most simplest parsing - that of a terminal. In our parser, we'll have a class to represent a terminal node in the AST. We'll place all our node classes inside `src/parser/nodes/index.ts`. Create this file and add the following implementation:
+
+```ts title=src/parser/nodes/index.ts
+import { Token } from "../lexer/index.ts";
+
+export enum NodeType {
+  PROGRAM = "PROGRAM",
+  TERM = "TERM",
+}
+
+export class Node {
+  type: NodeType;
+  loc: number;
+  children: Node[];
+
+  constructor() {
+    this.type = NodeType.PROGRAM;
+    this.loc = 0;
+    this.children = [];
+  }
+}
+
+export class NodeTerm extends Node {
+  token: Token;
+
+  constructor(token: Token) {
+    super();
+    this.type = NodeType.TERM;
+    this.loc = token.start;
+    this.token = token;
+  }
+}
+```
+
+Now inside our parser code in `src/parser/index.ts`, we'll implement a `parseTerm()` method and call it directly from `parse()` for now:
+
+```ts title=src/parser/index.ts
+export class Parser {
+  // ..
+  parse() {
+    return this.parseTerm();
+  }
+
+  parseTerm() {
+    if (this.peek(GomToken.IDENTIFIER)) {
+      const token = this.match(GomToken.IDENTIFIER);
+      return new NodeTerm(token);
+    } else if (this.peek(GomToken.NUMLITERAL)) {
+      const token = this.match(GomToken.NUMLITERAL);
+      return new NodeTerm(token);
+    } else {
+      throw {
+        message: `Unexpected token: ${this.token.value}`,
+        loc: this.token.start,
+      };
+    }
+  }
+}
+```
+
+The parser can now understand a single token terminal (an identifier or a number literal only for simplicity for now).
+
+Let's continue implementing `parseAddition()` similarly.
+
+```ts title=src/parser/index.ts
+export class Parser {
+  // ..
+  parse() {
+    return this.parseAddition();
+  }
+
+  parseAddition() {
+    const left = this.parseTerm();
+    this.match(GomToken.PLUS);
+    const right = this.parseTerm();
+
+    return NodeAddition({
+      left,
+      right,
+    });
+  }
+}
+```
+
+The implementation of `parseAddition()` represents how we want to parse an addition expression - we first parse a term on the left of `+`, we then expect a `+` sign, and then the right term. In case the input program is different from this format, the parser will throw a syntax error.
+
+**We are ready to try our tiny parser that reads addition expressions and build ASTs!**
+
+Update the `index.ts` file to invoke the parser and print the returned value.
+
+```ts title=index.ts
+export default function main(filePath: string) {
+  const src = readFileSync(filePath, "utf-8");
+  const lexer = new Lexer(src);
+  const parser = new Parser(lexer);
+  const program = parser.parse();
+
+  console.log(program);
+}
+```
+
+<Aside type="tip" title="Ready to Run">
+Update `test.gom` with the following:
+
+```txt title=test.gom
+1 + 2
+```
+
+Then run:
+
+```bash
+npm run compile test.gom
+```
+
+</Aside>
