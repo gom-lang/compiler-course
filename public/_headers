@@ -1,5 +1,5 @@
 /*
-  Cache-Control: public, max-age=3660, stale-while-revalidate=60
+  Cache-Control: public, max-age=1, stale-while-revalidate=60
 
 /_astro/*
   ! Cache-Control
