@@ -13,7 +13,13 @@ import { FileTree, Aside, Badge } from "@astrojs/starlight/components";
 import cover from "./images/cover.jpg";
 import { Image } from "astro:assets";
 
-<Image src={cover} quality={"low"} alt="Cover" style="background:white" />
+<Image
+  src={cover}
+  loading={"eager"}
+  quality={"low"}
+  alt="Cover"
+  style="background:white"
+/>
 
 The first phase of the compiler gave us a list of tokens. Lexical analysis read the input text and broke it down into Gom-aware _tokens_. In this chapter, we'll understand **parsing** - the process of understanding _structure_ in the input program. Structure helps us, the language implementors, know what the programmer desires to do in the program, and then act accordingly.
 

@@ -7,7 +7,7 @@ import { Image } from "astro:assets";
 import { Aside } from "@astrojs/starlight/components";
 import cover from "./images/gom.jpg";
 
-<Image src={cover} quality={"mid"} alt="Gom" />
+<Image src={cover} quality={"mid"} alt="Gom" loading={"eager"} />
 
 **Gom** is a statically typed programming language based on a subset of the ECMAScript (and Rust) syntax but providing type-safety and concise syntax. It can be interpreted or compiled to LLVM IR. It takes inspiration from AssemblyScript and makes it more approachable to learn compiler construction.
 
