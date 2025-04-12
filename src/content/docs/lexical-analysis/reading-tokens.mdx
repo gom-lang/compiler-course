@@ -6,7 +6,12 @@ import { Image } from "astro:assets";
 import { FileTree, Aside } from "@astrojs/starlight/components";
 import tokensImage from "./images/tokens.png";
 
-<Image src={tokensImage} alt="Tokens" style="background:white" />
+<Image
+  src={tokensImage}
+  quality={"mid"}
+  alt="Tokens"
+  style="background:white"
+/>
 
 The first stage of a compiler is lexical analysis, where the program text is read and converted into a set of _lexemes_ or _tokens_ according to the language grammar. These tokens are important in order to do further processing, they convert plain text to a sequence of meaningful pieces which then can be read by the parser to derive logical meaning. This stage at times can be skipped if you decide to use tools like _parser generators_. These tools automatically generate code for parsers (with a lexical analyser) from the language grammar. In our journey of building the Gom compiler, we’ll create a lexical analyser (also called lexer/scanner in short) ourselves, but if you are already aware of this process, you can take the parser generator path of this journey. We’ll meet again during intermediate representation generation.
 

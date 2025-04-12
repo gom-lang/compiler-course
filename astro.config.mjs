@@ -23,8 +23,8 @@ export default defineConfig({
 	integrations: [starlight({
 		title: 'Writing a Compiler in TypeScript',
 		logo: {
-			light: './src/assets/logo.png',
-			dark: './src/assets/logo-dark.png',
+			light: './src/assets/logo.avif',
+			dark: './src/assets/logo-dark.avif',
 			replacesTitle: true,
 		},
 		social: {
