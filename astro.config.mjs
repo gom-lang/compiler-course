@@ -27,8 +27,12 @@ export default defineConfig({
 			dark: './src/assets/logo-dark.avif',
 			replacesTitle: true,
 		},
+		lastUpdated: true,
 		social: {
 			github: 'https://github.com/gom-lang/compiler-course',
+			"linkedin": 'https://www.linkedin.com/in/mohit-karekar/',
+			"x.com": 'https://x.com/mohitkarekar',
+			"email": "mailto:karekar.mohit@gmail.com"
 		},
 		head: [
 			{
@@ -49,7 +53,7 @@ gtag('config', 'G-QMC0BNP18V');`,
 				attrs: {
 					type: 'text/partytown'
 				}
-			}
+			},
 		],
 		sidebar: [
 			{
@@ -77,7 +81,9 @@ gtag('config', 'G-QMC0BNP18V');`,
 				label: 'Parsing and Semantics',
 				items: [
 					{ label: 'Parsing & ASTs', slug: 'parsing-semantics/parsing-1' },
-					{ label: '⏳ Parsing Continued', slug: 'parsing-semantics/parsing-2' },
+					{ label: 'Parsing Continued - Gom Programs', slug: 'parsing-semantics/parsing-2' },
+					{ label: '⏳ Parsing Continued - Expressions', slug: 'parsing-semantics/parsing-3' },
+					{ label: 'Walking the AST with Visitors', slug: 'parsing-semantics/walking-the-ast' },
 					{ label: '⏳ A Simple Type System', slug: 'parsing-semantics/type-system' },
 					{ label: '⏳ Semantic Analysis', slug: 'parsing-semantics/semantic-analysis' },
 				]

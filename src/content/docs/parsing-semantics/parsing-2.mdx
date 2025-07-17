@@ -1,7 +1,207 @@
 ---
-title: Parsing Continued
+title: Parsing Continued - Gom Programs
 ---
 
 import ComingSoon from "./../../../components/ComingSoon.astro";
+import { LinkCard, Aside } from "@astrojs/starlight/components";
 
 <ComingSoon />
+
+Now that we have a simple parser ready, let's look at what constitutes a Gom program. A _program_ usually denotes a larger piece of logic that a programmer writes and performs a desired function. We'll approach the problem of parsing top-down, very similar to how our recursive-descent parser will actually parse our code.
+
+Like in other compiled languages, e.g. C, Rust, Go, programs written in our language Gom will have a `main` function which will act as an entry point for the logic conveyed by the program. In addition to a main function, the programmer can organise logic into standalone functions to enable code reuse. These functions are statically typed and need to be defined before they can be used and are like any other functions you might have written in various programming languages (accept arguments, return a value).
+
+## Breaking Down a Program
+
+Let's see how the description above translates to code. Going back to representing syntax in EBNF-like form, we can denote our `program` rule as follows:
+
+```
+program = functionDefinition* , mainFunction;
+```
+
+When we parse a program, we can expect zero or more function definitions and exactly one main function (and in that order). An example function definition looks like this:
+
+```ts
+function sum(a: int, b: int): int {
+  return a + b;
+}
+```
+
+And the main function looks like follows (similar to any other function, just the name "main" holds a special meaning in the program)
+
+```ts
+function main() {
+  // ...
+}
+```
+
+In order to extend our current parser to be able to parse function definitions and a main function, let's add three new methods:
+
+```ts title=src/parser/index.ts ins={5, 8-18} del={4}
+export class Parser {
+  // ..
+  parse() {
+    return this.parseAddition();
+    return this.parseProgram();
+  }
+
+  parseProgram() {
+    // todo
+  }
+
+  parseFunctionDefinition() {
+    // todo
+  }
+
+  parseMainFunction() {
+    // todo
+  }
+}
+```
+
+Throughout this lesson, we'll incrementally implement these methods to see our parser come to life. Before we write any code inside these, we have to tackle an important challenge: `functionDefinition*` - how do we parse these special occurrences in our language grammar?
+
+## Meta-functions for Repeating Matches
+
+While writing our parser, we'll encounter matching repeating occurences of a certain rule several times. It makes sense to have some utility functions for such matches so that we can reuse them. The most common of these are _zero or many_, \_one or many\_ and \_one or none.
+
+```ts title="An example of different possibilities - all are valid Gom programs"
+// program 1: No function definitions
+function main() {
+  // ...
+}
+
+// program 2: One function definition
+function sum(a: int, b: int): int {
+  return a + b;
+}
+
+function main() {
+  // ...
+}
+
+// program 3: More than one function definitions
+function sum(a: int, b: int): int {
+  return a + b;
+}
+
+function square(a: int): int {
+  return a * a;
+}
+
+function main() {
+  // ...
+}
+```
+
+Let's add three private methods in our parser that can handle parsing such occurrences, taking example of function definitions.
+
+```ts title=src/parser/index.ts
+export class Parser {
+  // ..
+  private parseOneOrNone<T>(parseFn: () => T): T | undefined {
+    try {
+      return parseFn.call(this);
+    } catch (e) {
+      return;
+    }
+  }
+
+  parseZeroOrMore<T>(parseFn: () => T): T[] {
+    let nodes: T[] = [];
+    while (1) {
+      try {
+        nodes.push(parseFn.call(this));
+      } catch (e) {
+        return nodes;
+      }
+    }
+
+    return nodes;
+  }
+
+  parseOneOrMore<T>(parseFn: () => T): T[] {
+    const nodes: T[] = [];
+    nodes.push(parseFn.call(this));
+    nodes.push(...this.parseZeroOrMore(parseFn));
+    return nodes;
+  }
+}
+```
+
+These methods help in parsing occurences of a node of a generic type `T` by accepting a function that parses a _single occurence of the node_. When called with such a function,
+
+- `parseOneOrNone` tries calling the function once and proceeds if a match is found. Else, it returns without causing any change to the parser state.
+- `parseZeroOrMore` keeps matching nodes by calling the provided function in an infinite loop until an error is encountered which results in a return.
+- `parseOneOrMore` calls the function once and then calls `parseZeroOrMore`.
+
+Let's add some code for our `parseProgram` method using these utility methods to implement the grammar for the rule `program`.
+
+```ts title=src/parser/index.ts
+export class Parser {
+  // ..
+  parseProgram() {
+    this.parseZeroOrMore(this.parseFunctionDefinition);
+    this.parseMainFunction();
+  }
+}
+```
+
+And we've successfully finished parsing a Gom program! Well, the functions themselves don't do anything at the moment and now it's our job to implement them next, but the `parseProgram` method is indeed complete - the magic of abstractions.
+
+## Function Definitions
+
+Our parser shell is ready! To make our parser work with all Gom grammar, we'll now have to implement parsing methods for each syntactic element. This need not happen all at once, we can keep implementing these methods gradually and increase support for features in our language.
+
+Let's start with function definitions. A `parseFunctionDefinition()` method will do the job of parsing a definition when the parser encounters a `function` keyword in expected positions. We may end up parsing functions in various situations, but for now, the simplest (and the only) way to find a function in a Gom program is in the "root scope", i.e. at the same as the `main` function.
+
+<Aside>
+  For us the `main` function is a special kind of function and will not be
+  considered a function definition, at least when we parse it.
+</Aside>
+
+```ts title=src/parser/index.ts
+export class Parser {
+  // ..
+  parseFunctionDefinition() {
+    const loc = this.token.start;
+    this.match(GomToken.FUNCTION);
+    const name = this.match(GomToken.IDENTIFIER);
+    this.match(GomToken.LPAREN);
+    const args = this.parseZeroOrMore(this.parseArgumentItem);
+    this.match(GomToken.RPAREN);
+    const returnType = this.parseOneOrNone(this.parseFunctionReturnType);
+    this.match(GomToken.LBRACE);
+    const body = this.parseOneOrMore(this.parseStatement);
+    this.match(GomToken.RBRACE);
+
+    return new NodeFunctionDefinition({
+      name,
+      args,
+      returnType,
+      body,
+      loc,
+    });
+  }
+}
+```
+
+## The `main` Function
+
+<LinkCard
+  title="gom/src/parser/rd/index.ts"
+  href="https://github.com/gom-lang/gom/blob/main/src/parser/rd/index.ts"
+  description="Entire parser code for Gom"
+/>
+---
+
+```
+Next chapters
+
+- expressions and priority
+- type system
+- semantic analysis
+  - visitors
+  - simple checks
+- codegen
+```

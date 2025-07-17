@@ -2,7 +2,7 @@
 title: Gom Extended Backus-Naur Form (EBNF)
 ---
 
-```ebnf
+```txt
 program = importDeclaration* , typeOrFunctionDefinition* , mainFunction;
 
 importDeclaration = "import" , stringLiteral , ";";
@@ -11,10 +11,10 @@ typeOrFunctionDefinition = typeDefinition | functionDefinition;
 
 typeDefinition = "type" , identifier , "=" , gomType , ";";
 
-functionDefinition = "fn" , identifier , "(" , argumentItem* , ")" , functionReturnType? ,
+functionDefinition = "function" , identifier , "(" , argumentItem* , ")" , functionReturnType? ,
 	"{" , statement+ , "}";
 
-mainFunction = "fn" , "main" , "(" , argumentItem* , ")" , functionReturnType? , 
+mainFunction = "function" , "main" , "(" , argumentItem* , ")" , functionReturnType? , 
 	"{" , statement+ , "}";
 
 statement = ifStatement

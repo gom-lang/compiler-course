@@ -9,7 +9,7 @@ import cover from "./images/gom.jpg";
 
 <Image src={cover} quality={"mid"} alt="Gom" loading={"eager"} />
 
-**Gom** is a statically typed programming language based on a subset of the ECMAScript (and Rust) syntax but providing type-safety and concise syntax. It can be interpreted or compiled to LLVM IR. It takes inspiration from AssemblyScript and makes it more approachable to learn compiler construction.
+**Gom** is a statically typed, compiled programming language based on a subset of the [TypeScript](https://www.typescriptlang.org/) syntax. It can be interpreted or compiled to LLVM IR. It takes inspiration from AssemblyScript and makes it more approachable to learn compiler construction.
 
 <Aside title="Trivia: Gom & Dune">
   The name _Gom_ is a nerdy reference to the _Gom Jabbar_ from the _Dune_ series
@@ -18,10 +18,10 @@ import cover from "./images/gom.jpg";
 
 Here’s a typical hello world program in Gom:
 
-```gom
+```ts
 import io;
 
-fn main() {
+function main() {
 	io.log("Hello, world!");
 }
 ```
@@ -30,21 +30,21 @@ The `main` function is the entry point to the program, similar to other statical
 
 Simple arithmetic and function declaration looks like this:
 
-```gom
+```ts
 import io;
 
-fn add(a: int, b: int): int {
+function add(a: int, b: int): int {
 	return a + b;
 }
 
-fn main() {
+function main() {
 	io.log("Sum:", add(1, 2)); // Prints "Sum: 3"
 }
 ```
 
 Defining complex data structures is possible via the `struct` notation (like `struct` in C/Rust/Go). `let` is the variable declaration keyword, it infers type from the expression on the right hand side of `=`.
 
-```gom
+```ts
 import io;
 
 type ArrInt = List<int>;
@@ -55,7 +55,7 @@ type Temperature = {
 	avg: int
 };
 
-fn main() {
+function main() {
 	let a = 1; // type inferred as int
 	io.log("a:", a);
 
@@ -71,9 +71,9 @@ fn main() {
 
 Apart from the built-in types, custom types can be created using the `type` keyword.
 
-```gom
+```ts
 type LikeInt = int;
-type IntOrFloat = int | float
+type IntOrFloat = int | float;
 ```
 
 ## Formalizing Syntax
@@ -93,16 +93,16 @@ Each line is a _rule_, left hand side being the rule name, right hand side being
 In this way, you can go on defining the grammar for more features in the language. Let's take another example before we see the entire Gom grammar. The following set of rules represent function definition in a modified [Extended Backus-Naur Form](https://ics.uci.edu/~pattis/misc/ebnf2.pdf), a superset of BNF with added syntax for common rules:
 
 ```txt title=functionDefinition.ebnf
-functionDefinition = "fn" , identifier , "(" , argumentItem* , ")" ,
+functionDefinition = "function" , identifier , "(" , argumentItem* , ")" ,
 						functionReturnType? ,
 						"{" , statement+ , "}";
 ```
 
 To compare again with a function definition in Gom:
 
-```gom title=addition.gom
-fn add(a: int, b: int): int {
-	return a + b;
+```ts title=addition.gom
+function add(a: int, b: int): int {
+  return a + b;
 }
 ```
 
@@ -119,7 +119,7 @@ The function definition in plain English would be something like:
 
 ```txt
 functionDefinition is made up of:
-	- "fn" Keyword
+	- "function" Keyword
 	- an identifier
 	- a "(" token
 	- zero or more argumentItems (expands to: argumentName ":" type ",")
@@ -143,10 +143,10 @@ typeOrFunctionDefinition = typeDefinition | functionDefinition;
 
 typeDefinition = "type" , identifier , "=" , gomType , ";";
 
-functionDefinition = "fn" , identifier , "(" , argumentItem* , ")" , functionReturnType? ,
+functionDefinition = "function" , identifier , "(" , argumentItem* , ")" , functionReturnType? ,
   "{" , statement+ , "}";
 
-mainFunction = "fn" , "main" , "(" , argumentItem* , ")" , functionReturnType? ,
+mainFunction = "function" , "main" , "(" , argumentItem* , ")" , functionReturnType? ,
   "{" , statement+ , "}";
 
 statement = ifStatement

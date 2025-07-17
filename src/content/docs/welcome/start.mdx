@@ -21,16 +21,13 @@ import cover from "./images/cover.jpg";
 
 Compilers! Aren't they fascinating? If you've ever thought about how they worked and about building one, welcome! These set of pages are for you. We'll be building a compiler from scratch for a toy language called **Gom** - a language with a simple, familiar syntax.
 
-<Code
-code={`
+```ts title="hello_world.gom"
 import io;
 
-fn main() {
-\tio.log("Hello, World!");
-}`}
-lang="rust"
-title="hello_world.gom"
-/>
+function main() {
+  io.log("Hello, World!");
+}
+```
 
 <Aside title="Trivia: Compilers and dragons 🐉">
   A popular analogy compares compilers to dragons, probably because they are
