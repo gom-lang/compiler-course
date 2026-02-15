@@ -2,11 +2,8 @@
 title: Parsing & Abstract Syntax Trees
 sidebar:
   label: Parsing & ASTs
-  badge:
-    text: New ✨
 ---
 
-import ComingSoon from "./../../../components/ComingSoon.astro";
 import ParsedMentalRep from "./images/mental-representation.svg";
 import LetTree from "./images/let-tree.svg";
 import { FileTree, Aside, Badge } from "@astrojs/starlight/components";
@@ -31,7 +28,7 @@ A parser's job is to read the tokens from the lexer and form a representation of
 
 Let's take a simple example before we come to parsing complete Gom programs. In fact, the following example is exactly the same if you write it in TypeScript.
 
-```ts title='A simple variable declaration or a "let statement"'
+```gom title='A simple variable declaration or a "let statement"'
 let a = 1 + 2;
 ```
 
@@ -71,7 +68,7 @@ We now know that ASTs are valuable in representing syntax in a way that can be o
 
 Let's take the same example from above, we have the following tokens from the lexer:
 
-```ts
+```gom
 let a = 1 + 2; // ➡ `let`, `a`, `=`, `1`, `+`, `2`, `;`
 ```
 

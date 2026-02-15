@@ -5,6 +5,7 @@ import gomLang from './gom.textmate.json';
 import partytown from '@astrojs/partytown';
 
 import sitemap from '@astrojs/sitemap';
+import starlightGiscus from "starlight-giscus";
 
 // https://astro.build/config
 export default defineConfig({
@@ -28,12 +29,28 @@ export default defineConfig({
 			replacesTitle: true,
 		},
 		lastUpdated: true,
-		social: {
-			github: 'https://github.com/gom-lang/compiler-course',
-			"linkedin": 'https://www.linkedin.com/in/mohit-karekar/',
-			"x.com": 'https://x.com/mohitkarekar',
-			"email": "mailto:karekar.mohit@gmail.com"
-		},
+		social: [
+			{
+				icon: "github",
+				href: "https://github.com/gom-lang/compiler-course",
+				label: "GitHub",
+			},
+			{
+				icon: "linkedin",
+				href: "https://www.linkedin.com/in/mohit-karekar/",
+				label: "LinkedIn",
+			},
+			{
+				icon: "x.com",
+				href: "https://x.com/mohitkarekar",
+				label: "X.com"
+			},
+			{
+				icon: "email",
+				href: "mailto:karekar.mohit@gmail.com",
+				label: "Email",
+			}
+		],
 		head: [
 			{
 				tag: 'script',
@@ -84,7 +101,7 @@ gtag('config', 'G-QMC0BNP18V');`,
 					{ label: 'Parsing Continued - Gom Programs', slug: 'parsing-semantics/parsing-2' },
 					{ label: '⏳ Parsing Continued - Expressions', slug: 'parsing-semantics/parsing-3' },
 					{ label: 'Walking the AST with Visitors', slug: 'parsing-semantics/walking-the-ast' },
-					{ label: '⏳ A Simple Type System', slug: 'parsing-semantics/type-system' },
+					{ label: 'Adding a Type System', slug: 'parsing-semantics/type-system' },
 					{ label: '⏳ Semantic Analysis', slug: 'parsing-semantics/semantic-analysis' },
 				]
 			},
@@ -116,12 +133,17 @@ gtag('config', 'G-QMC0BNP18V');`,
 			'@fontsource/ibm-plex-mono/400.css',
 			'@fontsource/ibm-plex-mono/600.css',
 		],
+		plugins: [
+			starlightGiscus({
+				repo: "gom-lang/compiler-course",
+				repoId: "R_kgDONoUTrg",
+				category: "Web Comments",
+				categoryId: "DIC_kwDONoUTrs4C2Nex"
+			})
+		],
 	}), partytown({
 		config: {
 			forward: ["dataLayer.push"]
 		}
 	}), sitemap()],
-	experimental: {
-		svg: true,
-	}
 });

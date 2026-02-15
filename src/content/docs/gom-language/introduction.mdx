@@ -18,7 +18,7 @@ import cover from "./images/gom.jpg";
 
 Here’s a typical hello world program in Gom:
 
-```ts
+```gom
 import io;
 
 function main() {
@@ -30,7 +30,7 @@ The `main` function is the entry point to the program, similar to other statical
 
 Simple arithmetic and function declaration looks like this:
 
-```ts
+```gom
 import io;
 
 function add(a: int, b: int): int {
@@ -44,7 +44,7 @@ function main() {
 
 Defining complex data structures is possible via the `struct` notation (like `struct` in C/Rust/Go). `let` is the variable declaration keyword, it infers type from the expression on the right hand side of `=`.
 
-```ts
+```gom
 import io;
 
 type ArrInt = List<int>;
@@ -71,7 +71,7 @@ function main() {
 
 Apart from the built-in types, custom types can be created using the `type` keyword.
 
-```ts
+```gom
 type LikeInt = int;
 type IntOrFloat = int | float;
 ```
@@ -100,7 +100,7 @@ functionDefinition = "function" , identifier , "(" , argumentItem* , ")" ,
 
 To compare again with a function definition in Gom:
 
-```ts title=addition.gom
+```gom title=addition.gom
 function add(a: int, b: int): int {
   return a + b;
 }

@@ -31,13 +31,13 @@ To begin, we’ll create a directory named `lexer` in `src` . The index file wil
 
 Let’s start by defining tokens from the EBNF grammar we created in the last chapter. Think of tokens as meaningful words in a paragraph. We ideally want to create tokens out of syntactically distinct group of characters. E.g. consider the following line.
 
-```ts
+```gom
 import io;
 ```
 
 While reading this line (as a human), we interpret `import` and `io` as two distinct items, and expect the language to assign suitable meaning to each of them. Similarly, in the following line, even when whitespace does not separate characters, they ideally are distinct.
 
-```ts
+```gom
 io.log("Hello, world!");
 ```
 
@@ -97,7 +97,7 @@ Symbols are non-alphanumeric characters that are often used as operators or have
 
 Lastly, we add identifiers. These are rest of the “content” of the program grouped in non-keyword terms and number and string literals. We also add a `INVALID` type to help mark invalid characters not understood by Gom. In all, this is how the enum looks.
 
-```tsx
+```ts
 // src/lexer/tokens.ts
 
 export enum GomToken {

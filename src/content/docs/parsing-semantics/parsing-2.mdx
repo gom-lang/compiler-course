@@ -21,7 +21,7 @@ program = functionDefinition* , mainFunction;
 
 When we parse a program, we can expect zero or more function definitions and exactly one main function (and in that order). An example function definition looks like this:
 
-```ts
+```gom
 function sum(a: int, b: int): int {
   return a + b;
 }
@@ -29,7 +29,7 @@ function sum(a: int, b: int): int {
 
 And the main function looks like follows (similar to any other function, just the name "main" holds a special meaning in the program)
 
-```ts
+```gom
 function main() {
   // ...
 }
@@ -65,7 +65,7 @@ Throughout this lesson, we'll incrementally implement these methods to see our p
 
 While writing our parser, we'll encounter matching repeating occurences of a certain rule several times. It makes sense to have some utility functions for such matches so that we can reuse them. The most common of these are _zero or many_, \_one or many\_ and \_one or none.
 
-```ts title="An example of different possibilities - all are valid Gom programs"
+```gom title="An example of different possibilities - all are valid Gom programs"
 // program 1: No function definitions
 function main() {
   // ...
